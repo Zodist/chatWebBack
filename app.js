@@ -19,9 +19,8 @@ require('dotenv').config();
 
 // sockect IO
 var server = require('http').createServer(app);
-var io = require('socket.io')(server, {
-  pingTimeout: 1000,
-});
+const webSocket = require("./socket");
+webSocket(server);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -77,50 +76,6 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
-});
-
-// socket io connect
-io.on('connection', function (socket) {
-  console.log("On connection : ", socket.client.id);
-  io.emit('personCnt', io.engine.clientsCount);
-
-  // 클라이언트로부터의 메시지가 수신되면
-  socket.on('chat', function (data) {
-    console.log('Message from %s: %s', data.name, data.msg);
-
-    var msg = {
-      from: {
-        name: data.name,
-      },
-      msg: data.msg
-    };
-
-    // 메시지를 전송한 클라이언트를 제외한 모든 클라이언트에게 메시지를 전송한다
-    socket.broadcast.emit('chat', msg);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected: ' + socket.name);
-    io.emit('personCnt', io.engine.clientsCount)
-    console.log('disconnect client 수', io.engine.clientsCount)
-  })
-
-  socket.on('disconnected', () => {
-    io.emit('personCnt', io.engine.clientsCount)
-  })
-
-  socket.on('returnPersonCnt', () => {
-    io.emit('personCnt', io.engine.clientsCount)
-  })
-  // socket.on('newenter', () => {
-  //     io.emit('enter')
-  // })
-
-  socket.on('type', () => {
-    socket.broadcast.emit('otherTyping')
-  })
-
-
 });
 
 server.listen(3001);

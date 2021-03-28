@@ -10,8 +10,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    console.log('req.isAuthenticated() : ', req.isAuthenticated())
-    console.log('req.user : ', req.user)
+    // console.log('req.isAuthenticated() : ', req.isAuthenticated())
+    // console.log('req.user : ', req.user)
     if (req.isAuthenticated()) {
         return res.redirect('/');
     }
