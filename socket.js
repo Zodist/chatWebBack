@@ -7,21 +7,29 @@ module.exports = (server) => {
         pingTimeout: 1000,
     });
 
-    // var connectCnt = 0;
-    var rooms = [];
+    function broadCastToRoom(roomName) {
+        const date = new Date();
+        const time = date.getHours() + ":" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes();
+        var msg = {
+            from: {
+                name: 'SYSTEM',
+            },
+            msg: ['SYSTEM MESSAGE'],
+            time: time,
+            roomName: roomName,
+        };
+        io.emit('chat', msg);
+    }
+
     // socket io connect
     io.on('connection', function (socket) {
         const req = socket.request;
         const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
         console.log(`✔ ${ip} 클라이언트 접속, socket.id : ${socket.id}, req.ip : ${req.ip}`);
-        // connectCnt++;
-        // io.emit('personCnt', connectCnt);
-        io.emit('rooms', rooms);
+        socket.leave(socket.id);
 
         socket.on('disconnect', () => {
             console.log(`${ip} 클라이언트 접속 해제. socket.id : ${socket.id}`);
-            // connectCnt--;
-            // io.emit('personCnt', connectCnt);
         });
 
         // ========== Custom Handler ==========
@@ -51,28 +59,73 @@ module.exports = (server) => {
         });
 
         // room 만들기
-        socket.on('makeRoom', function(data) {
+        // room 입장
+        socket.on('join', function (data) {
             socket.join(data.roomName);
-            rooms.push({
-                roomName: data.roomName,
-                userCnt: 1,
+
+            process.nextTick(() => {
+                // console.log('rooms', io.sockets.adapter.rooms);
+                // console.log('joinedRooms', socket.rooms);
+
+                // 현재 Socket 이 접속한 방 목록
+                var joinedRomms = [];
+                var allJoinedRooms = Object.keys(socket.rooms);
+                allJoinedRooms.forEach(element => {
+                    joinedRomms.push({
+                        roomName: element,
+                        userCnt: Object.keys(io.sockets.adapter.rooms[element].sockets).length,
+                    });
+                    socket.broadcast.to(element).emit("updateUserCntInRoom",{
+                        roomName: element,
+                        userCnt: Object.keys(io.sockets.adapter.rooms[element].sockets).length,
+                    })
+                });
+
+                // 현재 Socket 이 접속하지 않은 방 목록
+                var notJoinedRooms = [];
+                var allRooms = Object.keys(io.sockets.adapter.rooms);
+                var notJoinedRoomsRAW = allRooms.filter(val => !allJoinedRooms.includes(val));
+                notJoinedRoomsRAW.forEach(element => {
+                    notJoinedRooms.push({
+                        roomName: element,
+                        userCnt: Object.keys(io.sockets.adapter.rooms[element].sockets).length,
+                    });
+                });
+
+                socket.emit('joinedRooms', joinedRomms);
+                // socket.emit('availableRooms', notJoinedRooms);
+                // broadCastToRoom(data.roomName);
             });
-            // io.emit('rooms', io.sockets.adapter.rooms);
-            // console.log('rooms', io.sockets.adapter.rooms);
-            io.emit('rooms', rooms);
         });
 
-        // room 입장
-        socket.on('join', function(data) {
-            var roomName = data.roomName
-            socket.join(roomName);
-            var idx = rooms.findIndex(element => {
-                return element.roomName === roomName;
-            });
-            rooms[idx].userCnt = Object.keys(io.sockets.adapter.rooms[roomName].sockets).length;
+        // 입장 가능 room 조회
+        socket.on('getAvailableRoom', function (data) {
+            // console.log('rooms', io.sockets.adapter.rooms);
+            // console.log('joinedRooms', socket.rooms);
 
-            console.log('rooms', io.sockets.adapter.rooms[roomName].sockets);
-            io.emit('rooms', rooms);
+            // 현재 Socket 이 접속한 방 목록
+            var joinedRomms = [];
+            var allJoinedRooms = Object.keys(socket.rooms);
+            allJoinedRooms.forEach(element => {
+                joinedRomms.push({
+                    roomName: element,
+                    userCnt: Object.keys(io.sockets.adapter.rooms[element].sockets).length,
+                })
+            });
+
+            // 현재 Socket 이 접속하지 않은 방 목록
+            var notJoinedRooms = [];
+            var allRooms = Object.keys(io.sockets.adapter.rooms);
+            var notJoinedRoomsRAW = allRooms.filter(val => !allJoinedRooms.includes(val));
+            notJoinedRoomsRAW.forEach(element => {
+                notJoinedRooms.push({
+                    roomName: element,
+                    userCnt: Object.keys(io.sockets.adapter.rooms[element].sockets).length,
+                })
+            });
+
+            // socket.emit('joinedRooms', joinedRomms);
+            socket.emit('availableRooms', notJoinedRooms);
         });
     });
 };
