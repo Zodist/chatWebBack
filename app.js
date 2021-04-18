@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
 var passport = require('passport');
+var mongoose = require('mongoose');
 require('./passport').config(passport);
 
 var indexRouter = require('./routes/index');
@@ -17,11 +18,6 @@ var app = express();
 
 require('dotenv').config();
 
-// sockect IO
-var server = require('http').createServer(app);
-const webSocket = require("./socket");
-webSocket(server);
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -32,9 +28,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+/*
+// Node.js의 native Promise 사용
+mongoose.Promise = global.Promise;
+
+// CONNECT TO MONGODB SERVER
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('Successfully connected to mongodb'))
+  .catch(e => console.error(e));
+  */
+
 // cookie
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(session({
+
+var sessionMiddleWare = session({
   resave: false,
   saveUninitialized: false,
   secret: process.env.COOKIE_SECRET,
@@ -42,7 +49,13 @@ app.use(session({
     httpOnly: true,
     secure: false,
   }
-}));
+})
+app.use(sessionMiddleWare);
+
+// sockect IO
+var server = require('http').createServer(app);
+const webSocket = require("./socket");
+webSocket(server, sessionMiddleWare);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -51,7 +64,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/logout', logoutRouter);
-app.use('/api/signup', signupRouter)
+app.use('/api/signup', signupRouter);
+app.use('/api/todos', require('./routes/todos'));
 
 // CORS
 // var cors = require('cors');

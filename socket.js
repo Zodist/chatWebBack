@@ -1,7 +1,11 @@
-
+const Message = require('./models/message');
 const SocketIO = require("socket.io");
+var session = require('express-session');
+var moment = require('moment');
+require('moment-timezone');
+moment.tz.setDefault("Asia/Seoul");
 
-module.exports = (server) => {
+module.exports = (server, sessionMiddleWare) => {
 
     var io = SocketIO(server, {
         pingTimeout: 1000,
@@ -21,10 +25,24 @@ module.exports = (server) => {
         io.emit('chat', msg);
     }
 
+    io.use(function (socket, next) {
+        sessionMiddleWare(socket.request, socket.request.res, next);
+    });
+
     // socket io connect
     io.on('connection', function (socket) {
         const req = socket.request;
         const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+
+        //아래 두줄로 passport의 req.user의 데이터에 접근한다.
+        var session = socket.request.session.passport;
+        var user = (typeof session !== 'undefined') ? (session.user) : "";
+
+        //사용자 명과 메시지를 같이 반환한다.
+        socket.on('client message', function (data) {
+            io.emit('server message', { message: data.message, displayname: user.displayname });
+        });
+
         console.log(`✔ ${ip} 클라이언트 접속, socket.id : ${socket.id}, req.ip : ${req.ip}`);
         socket.leave(socket.id);
 
@@ -36,22 +54,25 @@ module.exports = (server) => {
 
         // 클라이언트로부터의 메시지가 수신되면
         socket.on('chat', function (data) {
-            console.log(`${data.name} in ${data.roomName} : ${data.msg}`);
+            console.log(`${user} in ${data.roomName} : ${data.content}`);
 
-            const date = new Date();
+            const date = moment().toDate();
             const time = date.getHours() + ":" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes();
             var msg = {
-                from: {
-                    name: data.name,
-                },
-                msg: [data.msg],
+                sender: user,
+                content: [data.content],
                 time: time,
                 roomName: data.roomName,
             };
-
+            /*
+            Message.create(msg)
+                .then()
+                .catch(err => console.log(err));
+            */
             // 메시지를 전송한 클라이언트를 제외한 모든 클라이언트에게 메시지를 전송한다
             //socket.broadcast.emit('chat', msg);
-            socket.broadcast.to(data.roomName).emit('chat', msg);
+            io.sockets.in(data.roomName).emit('chat', msg);
+            // socket.broadcast.to(data.roomName).emit('chat', msg);
         });
 
         socket.on('type', () => {
@@ -75,7 +96,7 @@ module.exports = (server) => {
                         roomName: element,
                         userCnt: Object.keys(io.sockets.adapter.rooms[element].sockets).length,
                     });
-                    socket.broadcast.to(element).emit("updateUserCntInRoom",{
+                    socket.broadcast.to(element).emit("updateUserCntInRoom", {
                         roomName: element,
                         userCnt: Object.keys(io.sockets.adapter.rooms[element].sockets).length,
                     })
