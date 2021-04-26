@@ -1,0 +1,15 @@
+# /swagger/Todos.yml
+
+components:
+  schemas:
+    Users:
+      properties:
+        user_id:
+          type: string
+          description: 번호
+        user_name:
+          type: string
+          description: 내용
+        user_pw:
+          type: string
+          description: 완료 여부

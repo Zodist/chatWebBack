@@ -7,6 +7,7 @@ var session = require('express-session');
 var passport = require('passport');
 var mongoose = require('mongoose');
 require('./passport').config(passport);
+const { swaggerUi, specs } = require('./modules/swagger')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -15,6 +16,9 @@ var logoutRouter = require('./routes/logout');
 var signupRouter = require('./routes/signup');
 
 var app = express();
+
+// swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
 
 require('dotenv').config();
 
@@ -28,15 +32,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-/*
+
 // Node.js의 native Promise 사용
 mongoose.Promise = global.Promise;
-
+mongoose.set('useCreateIndex', true)
 // CONNECT TO MONGODB SERVER
-mongoose.connect(process.env.MONGO_URI)
+// mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect('mongodb://localhost:27017', {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log('Successfully connected to mongodb'))
   .catch(e => console.error(e));
-  */
+
 
 // cookie
 app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -61,7 +70,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/logout', logoutRouter);
 app.use('/api/signup', signupRouter);

@@ -1,8 +1,25 @@
 const router = require('express').Router();
 const Todo = require('../models/todo');
+const authUtil = require('../middlewares/auth').checkToken
 
+/**
+ * @swagger
+ *  /api/todos:
+ *    get:
+ *      tags:
+ *      - todos
+ *      summary: 모든 할일 조회
+ *      security:
+ *          - Bearer: []
+ *      description: 모든 할일 조회
+ *      responses:
+ *       200:
+ *        description: 할일 조회 성공
+ *        schema:
+ *          $ref: '#/components/schemas/Todos'
+ */
 // Find All
-router.get('/', (req, res) => {
+router.get('/', authUtil, (req, res) => {
     Todo.findAll()
         .then((todos) => {
             if (!todos.length) return res.status(404).send({ err: 'Todo not Found' });
@@ -22,6 +39,27 @@ router.get('/todoid/:todoid', (req, res) => {
         .catch(err => res.status(500).send(err));
 });
 
+/**
+ * @swagger
+ *  /api/todos:
+ *    post:
+ *      tags:
+ *      - todos
+ *      summary: 할일 추가
+ *      parameters:
+ *      - in: body
+ *        name: user
+ *        description: The user to create.
+ *        schema:
+ *          $ref: '#/components/schemas/Todos'     # <----------
+ *      responses:
+ *        "200":
+ *          description: The created book.
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Todos'
+ */
 // Create new todo documnet
 router.post('/', (req, res) => {
     Todo.findAll()
