@@ -4,9 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
-var passport = require('passport');
 var mongoose = require('mongoose');
-require('./passport').config(passport);
 const { swaggerUi, specs } = require('./modules/swagger')
 
 var indexRouter = require('./routes/index');
@@ -31,14 +29,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname + '/uploads'));
+// app.use('/images/', express.static('../assets/uploads/'));
 
 
 // Node.js의 native Promise 사용
 mongoose.Promise = global.Promise;
 mongoose.set('useCreateIndex', true)
 // CONNECT TO MONGODB SERVER
-// mongoose.connect(process.env.MONGO_URI, {
-mongoose.connect('mongodb://localhost:27017', {
+mongoose.connect("mongodb://localhost:27017", {
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true,
@@ -66,15 +65,14 @@ var server = require('http').createServer(app);
 const webSocket = require("./socket");
 webSocket(server, sessionMiddleWare);
 
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/logout', logoutRouter);
 app.use('/api/signup', signupRouter);
 app.use('/api/todos', require('./routes/todos'));
+app.use('/api/upload', require('./routes/upload'));
+app.use('/api/download', require('./routes/download'));
 
 // CORS
 // var cors = require('cors');

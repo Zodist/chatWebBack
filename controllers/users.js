@@ -1,17 +1,18 @@
 const jwt = require('../modules/jwt');
-const User = require('../models/user');
+const User = require('../models/userV2');
 
 module.exports = {
     signin: async (req, res) => {
         /* user정보를 DB에서 조회 */
-        const user = await User.find(req.body);
-        if (!user.length) {
+        const id = req.body.id;
+        const user = await User.findOne({ id });
+        console.log("userInfo :", user);
+        if (!user) {
             return res.status(400).json({ error: 'invalid user' });
         }           
             
-        console.log("userInfo :", user);
         /* user의 idx, email을 통해 토큰을 생성! */
-        const jwtToken = await jwt.sign(user[0]);
+        const jwtToken = await jwt.sign(user);
         return res.status(200).json({
             token: jwtToken.token
         })

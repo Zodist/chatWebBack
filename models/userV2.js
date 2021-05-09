@@ -1,25 +1,28 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 const saltRounds = 10; // salt값을 10자리로 !
 const jwt = require('jsonwebtoken');
 
 const userSchema = mongoose.Schema({
+    id: {
+        type: String,
+        required: true,
+        maxlength: 50
+    },
+    password: {
+        type: String,
+        required: true,
+        minlength: 5
+    },
     name: {
         type: String,
+        required: true,
         maxlength: 50
     },
     email: {
         type: String,
         trim: true, // 해당 값 입력시 빈칸은 없애주는 역할! 
         unique: 1
-    },
-    password: {
-        type: String,
-        minlength: 5
-    },
-    lastname: {
-        type: String,
-        maxlength: 50
     },
     role: {
         type: Number,
@@ -34,6 +37,7 @@ const userSchema = mongoose.Schema({
     }
 });
 
+/*
 // user.save()하기 전에 실시
 userSchema.pre('save', function (next) {
     var user = this; // 상단의 객체를 가리킴
@@ -58,6 +62,7 @@ userSchema.methods.comparePassword = function (plainPassword, cb) {
         cb(null, isMatch);
     });
 };
+*/
 
 userSchema.methods.generateToken = function (cb) {
     var user = this;
@@ -86,5 +91,4 @@ userSchema.statics.findByToken = function (token, cb) {
             });
     });
 }
-const User = mongoose.model('User', userSchema);
-module.exports = { User }
+module.exports = mongoose.model('User', userSchema);

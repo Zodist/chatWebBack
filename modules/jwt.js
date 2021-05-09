@@ -9,8 +9,8 @@ module.exports = {
     sign: async (user) => {
         /* 현재는 idx와 email을 payload로 넣었지만 필요한 값을 넣으면 됨! */
         const payload = {
-            user_id: user.user_id,
-            user_name: user.user_name,
+            id: user.id,
+            password: user.password
         };
         const result = {
             //sign메소드를 통해 access token 발급!

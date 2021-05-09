@@ -12,7 +12,7 @@ const authUtil = {
             return res.status(401).json({ error: 'unauthorized' });
         let tokenString = tokenOrigin.split(' ')[1];
         // decode
-        const user = await jwt.verify(token);
+        const user = await jwt.verify(tokenString);
         // 유효기간 만료
         if (user === TOKEN_EXPIRED)
             return res.status(401).json({ error: 'token expired' });
@@ -21,7 +21,8 @@ const authUtil = {
             return res.status(401).json({ error: 'invalid expired' });
         // if (user.idx === undefined)
         //     return res.status(401).json({ error: 'invalid expired' });
-        req.idx = user.idx;
+        // req.idx = user.idx;
+        console.log("In middleWare : ", user)
         next();
     }
 }

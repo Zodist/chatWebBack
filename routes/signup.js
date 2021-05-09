@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-var users = require('../data/users.json');
+const usersController = require('../controllers/users');
 
 router.get('/', function(req, res, next) {
     if (req.isAuthenticated() && req.user) {
@@ -9,9 +9,27 @@ router.get('/', function(req, res, next) {
     return res.json({ user: null });
 });
 
-router.post('/', function(req, res, next) {
-    users.push(req.body);
-    return res.json({ user: null });
-});
+/**
+ * @swagger
+ *  /api/signup:
+ *    post:
+ *      tags:
+ *      - signup
+ *      summary: Creates a new user.
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Users'
+ *      responses:
+ *          '201':
+ *              description: Created
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Users'
+ */
+router.post('/', usersController.createNewUser);
 
 module.exports = router;

@@ -1,53 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const usersController = require('../controllers/users');
-const User = require('../models/user');
-
-/**
- * @swagger
- *  /api/users/login:
- *    post:
- *      tags:
- *      - users
- *      summary: 로그인
- *      parameters:
- *      - in: body
- *        name: user
- *        description: The user to create.
- *        schema:
- *          $ref: '#/components/schemas/Users'     # <----------
- *      responses:
- *        "200":
- *          description: 로그인 성공
- *          content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/Users'
- */
-router.post('/login', usersController.signin);
-
-/**
- * @swagger
- *  /api/users/new:
- *    post:
- *      tags:
- *      - users
- *      summary: Creates a new user.
- *      requestBody:
- *          required: true
- *          content:
- *              application/json:
- *                  schema:
- *                      $ref: '#/components/schemas/Users'
- *      responses:
- *          '201':
- *              description: Created
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Users'
- */
-router.post('/new', usersController.createNewUser);
+const User = require('../models/userV2');
 
 /**
  * @swagger

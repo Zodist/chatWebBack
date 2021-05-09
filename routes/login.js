@@ -1,36 +1,28 @@
 const express = require('express');
-const passport = require('passport');
 const router = express.Router();
+const usersController = require('../controllers/users');
 
-router.get('/', function(req, res, next) {
-    if (req.isAuthenticated() && req.user) {
-        return res.json({ user: req.user });
-    }
-    return res.json({ user: null });
-});
-
-router.post('/', function(req, res, next) {
-    // console.log('req.isAuthenticated() : ', req.isAuthenticated())
-    // console.log('req.user : ', req.user)
-    if (req.isAuthenticated()) {
-        return res.redirect('/');
-    }
-    passport.authenticate('local', (authError, user, info) => {
-        if (authError) {
-            console.error(authError);
-            return next(authError);
-        }
-        if (!user) {
-            return res.json(info);
-        }
-        return req.login(user, (loginError) => {
-            if (loginError) {
-                console.error(loginError);
-                return next(loginError);
-            }
-            return res.json({ user });
-        });
-    })(req, res, next);     // 미들웨어 호출
-});
+/**
+ * @swagger
+ *  /api/login:
+ *    post:
+ *      tags:
+ *      - login
+ *      summary: 로그인
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Users'
+ *      responses:
+ *        "200":
+ *          description: 로그인 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Users'
+ */
+router.post('/', usersController.signin);
 
 module.exports = router;

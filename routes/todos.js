@@ -46,12 +46,12 @@ router.get('/todoid/:todoid', (req, res) => {
  *      tags:
  *      - todos
  *      summary: 할일 추가
- *      parameters:
- *      - in: body
- *        name: user
- *        description: The user to create.
- *        schema:
- *          $ref: '#/components/schemas/Todos'     # <----------
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Todos'
  *      responses:
  *        "200":
  *          description: The created book.

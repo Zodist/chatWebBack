@@ -4,12 +4,27 @@ components:
   schemas:
     Users:
       properties:
-        user_id:
+        id:
           type: string
-          description: 번호
-        user_name:
+          description: ID
+        password:
           type: string
-          description: 내용
-        user_pw:
+          description: Password
+        name:
           type: string
-          description: 완료 여부
+          description: 이름
+        email:
+          type: string
+          description: 이메일
+        role:
+          type: string
+          description: 역할
+        image:
+          type: string
+          description: 사진
+        token:
+          type: string
+          description: 토큰
+        tokenExp:
+          type: string
+          description: 만료된 토큰
