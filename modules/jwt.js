@@ -37,6 +37,7 @@ module.exports = {
                 return TOKEN_INVALID;
             }
         }
+        // console.log("In verify : ", decoded)
         return decoded;
     }
 }

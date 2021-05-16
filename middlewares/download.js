@@ -67,7 +67,7 @@ module.exports.getFile = (req, res) => {
                         //Display the chunks using the data URI format          
                         let finalFile = 'data:' + docs[0].contentType + ';base64,'
                             + fileData.join('');
-                        console.log("finalFile", finalFile)
+                        // console.log("finalFile", finalFile)
                         res.finalFile = finalFile
                         return res.send(finalFile);
                         // return Promise.resolve(finalFile)

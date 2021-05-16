@@ -9,8 +9,8 @@ module.exports = {
         console.log("userInfo :", user);
         if (!user) {
             return res.status(400).json({ error: 'invalid user' });
-        }           
-            
+        }
+
         /* user의 idx, email을 통해 토큰을 생성! */
         const jwtToken = await jwt.sign(user);
         return res.status(200).json({
@@ -23,11 +23,11 @@ module.exports = {
     },
     createNewUser: async function (req, res, next) {
         User(req.body).save()
-        .then(user => res.status(201).json({
-            result: 'ok',
-            user: user
-        }))
-        .catch(err => res.status(500).send(err));
+            .then(user => res.status(201).json({
+                result: 'ok',
+                user: user
+            }))
+            .catch(err => res.status(500).send(err));
         // try {
         //     const user = await new User(req.body).save();
         //     res.status(201).json({
@@ -41,7 +41,16 @@ module.exports = {
     },
     updateUser: async function (req, res, next) {
         User.updateByUserId(req.params.id, req.body)
-        .then(todo => res.send(todo))
-        .catch(err => res.status(500).send(err));
-    }
+            .then(todo => res.send(todo))
+            .catch(err => res.status(500).send(err));
+    },
+    getUserInfo: async function (req, res, next) {
+        let tokenOrigin = req.headers.authorization;
+        let tokenString = tokenOrigin.split(' ')[1];
+        const loginedUser = await jwt.verify(tokenString);
+        const user = await User.findOne({ id :loginedUser.id });
+        return res.status(200).json({
+            user: user
+        })
+    },
 }

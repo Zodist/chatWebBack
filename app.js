@@ -11,7 +11,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var loginRouter = require('./routes/login');
 var logoutRouter = require('./routes/logout');
-var signupRouter = require('./routes/signup');
+var userRouter = require('./routes/user');
 
 var app = express();
 
@@ -37,7 +37,11 @@ app.use(express.static(__dirname + '/uploads'));
 mongoose.Promise = global.Promise;
 mongoose.set('useCreateIndex', true)
 // CONNECT TO MONGODB SERVER
-mongoose.connect("mongodb://localhost:27017", {
+mongoose.connect("mongodb://localhost:27017/test",
+  {
+    // "auth": { "authSource": "admin" },
+    "user": "persona",
+    "pass": "person",
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true,
@@ -66,10 +70,12 @@ const webSocket = require("./socket");
 webSocket(server, sessionMiddleWare);
 
 app.use('/', indexRouter);
+
 app.use('/api/users', usersRouter);
+
+app.use('/api/user', userRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/logout', logoutRouter);
-app.use('/api/signup', signupRouter);
 
 app.use('/api/todos', require('./routes/todos'));
 

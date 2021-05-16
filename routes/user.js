@@ -1,21 +1,34 @@
 const express = require('express');
 const router = express.Router();
 const usersController = require('../controllers/users');
-
-router.get('/', function(req, res, next) {
-    if (req.isAuthenticated() && req.user) {
-        return res.json({ user: req.user });
-    }
-    return res.json({ user: null });
-});
+const authUtil = require('../middlewares/auth').checkToken
+const jwt = require('../modules/jwt');
 
 /**
  * @swagger
- *  /api/signup:
+ *  /api/user:
+ *    get:
+ *      tags:
+ *      - user
+ *      summary: 로그인한 유저 정보 조회
+ *      security:
+ *          - Bearer: []
+ *      description: 로그인한 유저 정보 조회
+ *      responses:
+ *       200:
+ *        description: 할일 조회 성공
+ *        schema:
+ *          $ref: '#/components/schemas/Users'
+ */
+router.get('/', authUtil, usersController.getUserInfo);
+
+/**
+ * @swagger
+ *  /api/user:
  *    post:
  *      tags:
- *      - signup
- *      summary: Creates a new user.
+ *      - user
+ *      summary: user 등록.
  *      requestBody:
  *          required: true
  *          content:
@@ -34,10 +47,10 @@ router.post('/', usersController.createNewUser);
 
 /**
  * @swagger
- *  /api/signup/{id}:
+ *  /api/user/{id}:
  *    put:
  *      tags:
- *      - signup
+ *      - user
  *      summary: user 정보 수정.
  *      parameters:
  *       - in: path

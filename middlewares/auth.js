@@ -22,7 +22,7 @@ const authUtil = {
         // if (user.idx === undefined)
         //     return res.status(401).json({ error: 'invalid expired' });
         // req.idx = user.idx;
-        console.log("In middleWare : ", user)
+        // console.log("In middleWare : ", user)
         next();
     }
 }
