@@ -17,7 +17,7 @@ components:
           type: string
           description: 이메일
         role:
-          type: string
+          type: integer
           description: 역할
         image:
           type: string
@@ -26,5 +26,5 @@ components:
           type: string
           description: 토큰
         tokenExp:
-          type: string
+          type: integer
           description: 만료된 토큰

@@ -22,15 +22,26 @@ module.exports = {
         // }))
     },
     createNewUser: async function (req, res, next) {
-        try {
-            const user = await new User(req.body).save();
-            res.status(201).json({
-                result: 'ok',
-                user: user
-            });
-        } catch (err) {
-            console.error(err);
-            next(err);
-        }
+        User(req.body).save()
+        .then(user => res.status(201).json({
+            result: 'ok',
+            user: user
+        }))
+        .catch(err => res.status(500).send(err));
+        // try {
+        //     const user = await new User(req.body).save();
+        //     res.status(201).json({
+        //         result: 'ok',
+        //         user: user
+        //     });
+        // } catch (err) {
+        //     console.error(err);
+        //     next(err);
+        // }
+    },
+    updateUser: async function (req, res, next) {
+        User.updateByUserId(req.params.id, req.body)
+        .then(todo => res.send(todo))
+        .catch(err => res.status(500).send(err));
     }
 }

@@ -64,6 +64,12 @@ userSchema.methods.comparePassword = function (plainPassword, cb) {
 };
 */
 
+// Update by todoid
+userSchema.statics.updateByUserId = function (id, payload) {
+    // {new: true} : return the modified document rather than the original. defaults to false
+    return this.findOneAndUpdate({ id }, payload, {new: true});
+}
+
 userSchema.methods.generateToken = function (cb) {
     var user = this;
 

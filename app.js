@@ -70,9 +70,12 @@ app.use('/api/users', usersRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/logout', logoutRouter);
 app.use('/api/signup', signupRouter);
+
 app.use('/api/todos', require('./routes/todos'));
+
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/download', require('./routes/download'));
+app.use('/api/photolist', require('./routes/photo'))
 
 // CORS
 // var cors = require('cors');
