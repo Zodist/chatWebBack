@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const saltRounds = 10; // salt값을 10자리로 !
 const jwt = require('jsonwebtoken');
 
@@ -37,13 +37,13 @@ const userSchema = mongoose.Schema({
     }
 });
 
-/*
 // user.save()하기 전에 실시
 userSchema.pre('save', function (next) {
     var user = this; // 상단의 객체를 가리킴
     // password가 변경될 때만 암호화 실행!
+    const saltFactor = 10;
     if (user.isModified('password')) {
-        bcrypt.genSalt(saltRounds, function (err, salt) {
+        bcrypt.genSalt(saltFactor, function (err, salt) {
             if (err) return next(err); // error나면 바로 save로 진행
             bcrypt.hash(user.password, salt, function (err, hash) {
                 if (err) return next(err);
@@ -62,12 +62,11 @@ userSchema.methods.comparePassword = function (plainPassword, cb) {
         cb(null, isMatch);
     });
 };
-*/
 
 // Update by todoid
 userSchema.statics.updateByUserId = function (id, payload) {
     // {new: true} : return the modified document rather than the original. defaults to false
-    return this.findOneAndUpdate({ id }, payload, {new: true});
+    return this.findOneAndUpdate({ id }, payload, { new: true });
 }
 
 userSchema.methods.generateToken = function (cb) {
