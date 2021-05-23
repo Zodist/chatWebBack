@@ -66,4 +66,25 @@ module.exports = {
             user: user
         })
     },
+    verifyToken: async function (req, res, next) {
+        let tokenOrigin = req.headers.authorization;
+        let logined = false;
+        const TOKEN_EXPIRED = -3;
+        const TOKEN_INVALID = -2;
+        // 토큰 없음
+        if (tokenOrigin) {
+            let tokenString = tokenOrigin.split(' ')[1];
+            // decode
+            const user = await jwt.verify(tokenString);
+            console.log(user);
+            // 유효기간 만료
+            if (!(user === TOKEN_EXPIRED || user === TOKEN_INVALID)) {
+                logined = true
+            }
+        }
+
+        return res.status(200).json({
+            logined: logined
+        })
+    },
 }
