@@ -83,6 +83,8 @@ app.use('/api/upload', require('./routes/upload'));
 app.use('/api/download', require('./routes/download'));
 app.use('/api/photolist', require('./routes/photo'))
 
+app.use('/api/earth2', require('./routes/earth2'))
+
 // CORS
 // var cors = require('cors');
 // app.use(cors());
