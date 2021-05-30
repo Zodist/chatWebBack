@@ -37,11 +37,11 @@ app.use(express.static(__dirname + '/uploads'));
 mongoose.Promise = global.Promise;
 mongoose.set('useCreateIndex', true)
 // CONNECT TO MONGODB SERVER
-mongoose.connect("mongodb://localhost:27017/test",
+mongoose.connect("mongodb://3.84.249.206:27017/test",
   {
     // "auth": { "authSource": "admin" },
-    "user": "persona",
-    "pass": "person",
+    // "user": "persona",
+    // "pass": "person",
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true,

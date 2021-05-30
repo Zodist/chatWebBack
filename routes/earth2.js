@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const request = require('request')
+const request = require('request');
+const Country = require('../models/earth2');
 
 router.get('/', (req, res) => {
     const requestUrl_earth2 = 'https://earth2stats.net/api/get_countries';
@@ -27,6 +28,7 @@ router.get('/', (req, res) => {
                 element.marketplace_tile_value = Math.round(element.marketplace_tile_value * usdkrw);
                 element.assume_total_price = Math.round(element.assume_total_price * usdkrw);
             });
+            Country.insertMany(data);
             res.send(data);
         })
     })
