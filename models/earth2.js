@@ -8,6 +8,7 @@ const countrySchema = mongoose.Schema({
     marketplace_tile_value: { type: Number },
     total_sold_tiles: { type: Number },
     assume_total_price: { type: Number },
+    time: {type: Date},
 });
 
 module.exports = mongoose.model('Country', countrySchema);

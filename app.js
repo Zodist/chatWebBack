@@ -32,6 +32,39 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname + '/uploads'));
 // app.use('/images/', express.static('../assets/uploads/'));
 
+const Country = require('./models/earth2');
+var schedule = require('node-schedule');
+const request = require('request');
+var moment = require('moment');
+require('moment-timezone');
+moment.tz.setDefault("Asia/Seoul");
+var scheduler = schedule.scheduleJob('0 0 */1 * * *', function () {
+  const requestUrl_earth2 = 'https://earth2stats.net/api/get_countries';
+  const requestUrl_exchangeRatio = 'https://earthquake.kr:23490/query/USDKRW'
+  request(requestUrl_earth2, (err, response, body) => {
+
+    if (err) console.log(err);
+    let data = JSON.parse(body);
+    data.forEach(element => {
+      element.assume_total_price = element.marketplace_tile_value * element.total_sold_tiles;
+    });
+    // res.send(data);
+
+    request(requestUrl_exchangeRatio, (err, response, body) => {
+      if (err) console.log(err);
+      const usdkrw = JSON.parse(body).USDKRW[0];
+      // console.log(usdkrw);
+      data.forEach(element => {
+        element.new_tile_price = Math.round(element.new_tile_price * usdkrw);
+        element.marketplace_tile_value = Math.round(element.marketplace_tile_value * usdkrw);
+        element.assume_total_price = Math.round(element.assume_total_price * usdkrw);
+        element.time = moment().toDate();
+      });
+      Country.insertMany(data);
+    })
+  })
+});
+
 
 // Node.js의 native Promise 사용
 mongoose.Promise = global.Promise;

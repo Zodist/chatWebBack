@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const request = require('request');
 const Country = require('../models/earth2');
+var moment = require('moment');
+require('moment-timezone');
+moment.tz.setDefault("Asia/Seoul");
 
 router.get('/', (req, res) => {
     const requestUrl_earth2 = 'https://earth2stats.net/api/get_countries';
@@ -27,6 +30,7 @@ router.get('/', (req, res) => {
                 element.new_tile_price = Math.round(element.new_tile_price * usdkrw);
                 element.marketplace_tile_value = Math.round(element.marketplace_tile_value * usdkrw);
                 element.assume_total_price = Math.round(element.assume_total_price * usdkrw);
+                element.time = moment().toDate();
             });
             Country.insertMany(data);
             res.send(data);
