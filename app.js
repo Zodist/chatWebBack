@@ -41,8 +41,7 @@ moment.tz.setDefault("Asia/Seoul");
 
 console.log("time:", moment().format('YYYY-MM-DD HH:mm:ss'));
 
-//var scheduler = schedule.scheduleJob('0 0 */1 * * *', function () {
-  /*
+var scheduler = schedule.scheduleJob('0 0 */1 * * *', function () {
   const requestUrl_earth2 = 'https://earth2stats.net/api/get_countries';
   // const ak = 'cf2b4ee42c55630ff5723fc937b925e6'
   // const requestUrl_exchangeRatio = `http://api.exchangeratesapi.io/v1/latest?base=USD&access_key=${ak}`;
@@ -72,7 +71,6 @@ console.log("time:", moment().format('YYYY-MM-DD HH:mm:ss'));
     })
   })
 });
-*/
 
 // Node.js의 native Promise 사용
 mongoose.Promise = global.Promise;
