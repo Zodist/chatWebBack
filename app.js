@@ -38,8 +38,16 @@ const request = require('request');
 var moment = require('moment');
 require('moment-timezone');
 moment.tz.setDefault("Asia/Seoul");
-var scheduler = schedule.scheduleJob('0 0 */1 * * *', function () {
+
+console.log("time:", moment().format('YYYY-MM-DD HH:mm:ss'));
+
+//var scheduler = schedule.scheduleJob('0 0 */1 * * *', function () {
+  /*
   const requestUrl_earth2 = 'https://earth2stats.net/api/get_countries';
+  // const ak = 'cf2b4ee42c55630ff5723fc937b925e6'
+  // const requestUrl_exchangeRatio = `http://api.exchangeratesapi.io/v1/latest?base=USD&access_key=${ak}`;
+  // const requestUrl_exchangeRatio = `http://api.exchangeratesapi.io/v1/convert?access_key=${ak}&from=USD&to=KOR&amount=1`;
+  // const requestUrl_exchangeRatio = 'http://api.exchangeratesapi.io/v1/latest?access_key=cf2b4ee42c55630ff5723fc937b925e6?base=USD'
   const requestUrl_exchangeRatio = 'https://earthquake.kr:23490/query/USDKRW'
   request(requestUrl_earth2, (err, response, body) => {
 
@@ -64,7 +72,7 @@ var scheduler = schedule.scheduleJob('0 0 */1 * * *', function () {
     })
   })
 });
-
+*/
 
 // Node.js의 native Promise 사용
 mongoose.Promise = global.Promise;
