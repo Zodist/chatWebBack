@@ -1,41 +1,44 @@
 const router = require('express').Router();
-const request = require('request');
 const Country = require('../models/earth2');
-var moment = require('moment');
-require('moment-timezone');
-moment.tz.setDefault("Asia/Seoul");
+
+function date2string(params) {
+    var mm = params.getMonth() + 1;
+    var dd = params.getDate();
+    var hh = params.getHours();
+
+    return [params.getFullYear(),
+    (mm > 9 ? '' : '0') + mm,
+    (dd > 9 ? '' : '0') + dd,
+    (hh > 9 ? '' : '0') + hh
+    ].join('');
+}
 
 router.get('/', (req, res) => {
-    const requestUrl_earth2 = 'https://earth2stats.net/api/get_countries';
-    // const ak = 'cf2b4ee42c55630ff5723fc937b925e6'
-    // const requestUrl_exchangeRatio = `http://api.exchangeratesapi.io/v1/latest?base=USD&access_key=${ak}`;
-    // const requestUrl_exchangeRatio = `http://api.exchangeratesapi.io/v1/convert?access_key=${ak}&from=USD&to=KOR&amount=1`;
-    // const requestUrl_exchangeRatio = 'http://api.exchangeratesapi.io/v1/latest?access_key=cf2b4ee42c55630ff5723fc937b925e6?base=USD'
-
-    const requestUrl_exchangeRatio = 'https://earthquake.kr:23490/query/USDKRW'
-    request(requestUrl_earth2, (err, response, body) => {
-
-        if (err) console.log(err);
-        let data = JSON.parse(body);
-        data.forEach(element => {
-            element.assume_total_price = element.marketplace_tile_value * element.total_sold_tiles;
-        });
-        // res.send(data);
-
-        request(requestUrl_exchangeRatio, (err, response, body) => {
-            if (err) console.log(err);
-            const usdkrw = JSON.parse(body).USDKRW[0];
-            // console.log(usdkrw);
-            data.forEach(element => {
-                element.new_tile_price = Math.round(element.new_tile_price * usdkrw);
-                element.marketplace_tile_value = Math.round(element.marketplace_tile_value * usdkrw);
-                element.assume_total_price = Math.round(element.assume_total_price * usdkrw);
-                element.time = moment().toDate();
+    Country.find({})
+        .then((countries) => {
+            if (!countries.length) return res.status(404).send({ err: 'Country not Found' });
+            let latestUpdateTime = countries[0].time;
+            for (let i = 0; i < countries.length; i++) {
+                if (countries[i].time > latestUpdateTime) {
+                    latestUpdateTime = countries[i].time;
+                }
+            }
+            console.log("latestUpdateTime: ", latestUpdateTime)
+            let filteredCountries = countries.filter(el => {
+                return date2string(el.time) == date2string(latestUpdateTime);
             });
-            Country.insertMany(data);
-            res.send(data);
+            res.send(filteredCountries);
         })
-    })
-})
+        .catch(err => res.status(500).send(err));
+});
+
+router.get('/:countryCd', (req, res) => {
+    Country.find({code:req.params.countryCd})
+        .then((countries) => {
+            if (!countries.length) return res.status(404).send({ err: 'Country not Found' });
+            res.send(countries);
+        })
+        .catch(err => res.status(500).send(err));
+});
 
 module.exports = router
