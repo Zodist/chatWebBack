@@ -72,15 +72,16 @@ var scheduler = schedule.scheduleJob('0 0 */1 * * *', function () {
   })
 });
 
+const mongoConfig = require('./config/mongoConfig');
 // Node.js의 native Promise 사용
 mongoose.Promise = global.Promise;
 mongoose.set('useCreateIndex', true)
 // CONNECT TO MONGODB SERVER
 mongoose.connect("mongodb://3.84.249.206:27017/test",
   {
-    // "auth": { "authSource": "admin" },
-    // "user": "persona",
-    // "pass": "person",
+    "auth": { "authSource": "admin" },
+    "user": mongoConfig.user,
+    "pass": mongoConfig.pass,
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true,
